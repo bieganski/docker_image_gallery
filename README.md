@@ -1,2 +1,2 @@
-# docker_image_gallery
-Project for college subject
+# Univeristy_project
+Image gallery using docker 

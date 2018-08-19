@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Bootstrap Example</title>
+</head>
+  
+{% for photo in photos %}
+<li> {{photo.id}} ------ {{photo.url}} -------- {{photo.desc}} ------  {{photo.votes}} </li>
+{% endfor %}
+
+</body>
+</html>

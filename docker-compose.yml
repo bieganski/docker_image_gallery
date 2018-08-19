@@ -1,0 +1,41 @@
+# Use postgres/example user/password credentials
+version: '3.4'
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: example
+      POSTGRES_USER: 'user'
+      POSTGRES_DB: 'images'
+    ports:
+      - 5111:5432
+    container_name: postgres_db
+      
+  flask_db:
+    depends_on:
+      - "postgres"
+    build: ./database_microservice
+    ports:
+      - 5000:5000
+
+  minio:
+    build: ./minio
+    environment:
+      MINIO_ACCESS_KEY: "ADMIN"
+      MINIO_SECRET_KEY: "EXAMPLEPASSWORD"
+    command: server /photos
+    ports:
+      - 9000:9000 
+  
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+      
+  front:
+    depends_on: 
+      - "minio"
+    build: ./front
+    
