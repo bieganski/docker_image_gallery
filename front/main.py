@@ -3,8 +3,7 @@ from minio.error import ResponseError
 from datetime import timedelta
 import time,socket,sys,json,urllib,os,urllib2
 from flask import Flask, flash, request, redirect, url_for,render_template,send_from_directory
-from werkzeug.utils import secure_filename
-import tempfile
+
 
 def add_photo_to_db(photo):
     try:
@@ -20,17 +19,18 @@ def add_photo_to_db(photo):
     except:
         print("Could not add " + str(photo) + " to db..." )
 
+# Wait for minio to accepting connections
 address="notyet"
-ktory=0
 while address == "notyet":
-    ktory = ktory + 1
     try:
         address = socket.gethostbyname('minio')
         print( "Minio ip address is:" + address)
     except socket.gaierror:
-        print("Nie znam tego hostu :<")
+        print("Waiting for minio")
         time.sleep(1)
 
+# We need to calculated by ip because there is signature
+# which is counted using hostname
 minioClient = Minio('{}:9000'.format(address),
                   access_key='ADMIN',
                   secret_key='EXAMPLEPASSWORD', secure=False)
@@ -44,17 +44,12 @@ print( bucket_photos)
 app = Flask(__name__)
 
 APP_ROOT = os.path.dirname(os.path.abspath(__file__))
-# UPLOAD_FOLDER = '/home/michal/proba_flask/src'
 
-# ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
-# app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# def allowed_file(filename):
-#     return '.' in filename and \
-#            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
+image_counter = 0
 @app.route('/',methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
+
         target = os.path.join(APP_ROOT, 'images/')
         print(target)
 
@@ -62,17 +57,25 @@ def index():
             os.mkdir(target)
 
         for file in request.files.getlist("file"):
+            global image_counter
+            image_counter = image_counter + 1
             filename = file.filename
-            filename = "filemon"
+            filename = 'picture_nr{}.jpg'.format(image_counter)
             destination = "/".join([target, filename])
-            print(destination)
             file.save(destination)
 
-        try:
-            print(minioClient.fput_object('animals', 'filemon', './images/filemon'))
-        except ResponseError as err:
-            print(err)
-        add_photo_to_db('filemon')
+            try:
+                print(minioClient.fput_object('animals', filename, destination))
+                add_photo_to_db(filename)
+            except ResponseError as err:
+                print(err)
+
+            # #This is option2 for the above - it should works
+            # with open('images/{}'.format(filename), 'rb') as file_data:
+            #     file_stat = os.stat('images/{}'.format(filename))
+            #     print(minioClient.put_object('animals', filename,
+            #                                  file_data, file_stat.st_size))
+
 
     url = "http://flask_db:5000/photos"
     response = urllib.urlopen(url)
@@ -82,20 +85,3 @@ def index():
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0',port=5151)
-
-
-# file = open("testfile.txt","w")
-# file.write(giraffe_url)
-# file.close()
-
-#file2 = open("resp","w") 
-#file2.write(response)
-#file2.close()
-
-# time.sleep(232344324)
-
-
-# buckets=minioClient.list_buckets()
-#
-# for b in buckets:
-#     print(b)
