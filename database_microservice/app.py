@@ -45,11 +45,7 @@ while no_conn:
         print( "Im waiting for connection with database")
         time.sleep(1)
 
-
 db.create_all()
-@app.route('/')
-def index():
-    return "<h1> No siema </h1>"
 
 
 @app.route('/post_data', methods=['POST'])
@@ -62,11 +58,6 @@ def processjson():
     db.session.add(photo)
     db.session.commit()
     return json_response(success=True)
-
-@app.route('/photos_human_readable')
-def photos_human_readable():
-    photos = Photo.query.all()
-    return render_template('index.html', photos = photos)
     
 @app.route('/photos')
 def photos():

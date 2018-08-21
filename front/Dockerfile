@@ -17,5 +17,7 @@ ENV NAME World
 # Copy app.py into the container at /app
 ADD main.py /app
 
+EXPOSE 5151
+
 # Run app.py when the container launches
 CMD ["python", "main.py"]
