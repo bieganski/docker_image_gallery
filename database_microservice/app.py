@@ -64,5 +64,13 @@ def photos():
     photos = Photo.query.all()
     return jsonify(json_list=[i.serialize for i in photos ] )
 
+@app.route('/vote/<id>')
+def vote(id):
+    photo = Photo.query.filter_by(id=id).first()
+    photo.votes = photo.votes + 1
+    db.session.commit()
+    return '<h1> Success! <h1>'
+
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

@@ -7,7 +7,18 @@
         width:300px;
     }
 
+    .button {
+        text-align: center;
+    }
+
     </style>
+
+    <script>
+    function vote(nr) {
+       alert("Voted:" + nr)
+    }
+    </script>
+
   <title>Bootstrap Example</title>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -42,6 +53,9 @@
               <!-- Trigger the modal with a button -->
               <img class="img-responsive thumbnail " src="{{photo.url}}" data-toggle="modal" data-target="#photo{{photo.id}}">
               <!-- Modal -->
+                    <div class="button">
+                        <button onclick="vote({{ photo.id }})" class="btn btn-warning" > Votes:{{ photo.votes }}</button>
+                    </div>
             </div>
             {% endfor %}
         </div>
