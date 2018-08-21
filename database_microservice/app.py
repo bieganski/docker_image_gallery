@@ -1,6 +1,7 @@
 from  flask import Flask, render_template,request,jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_json import FlaskJSON, JsonError, json_response, as_json
+import time
 
 
 app = Flask(__name__)
@@ -35,22 +36,17 @@ class Photo(db.Model):
     def __repr__(self):
         return 'Url: %r' % self.url
 
+no_conn=True
+while no_conn:
+    try:
+        db.session.execute('SELECT 1')
+        no_conn=False
+    except:
+        print( "Im waiting for connection with database")
+        time.sleep(1)
+
+
 db.create_all()
-
-# photo = Photo("fajny_url1",1,"no elo1")
-# db.session.add(photo)
-#
-# photo = Photo("fajny_url2",2,"no elo2")
-# db.session.add(photo)
-#
-# photo = Photo("fajny_url3",3,"no elo3")
-# db.session.add(photo)
-#
-# photo = Photo("fajny_url4",4,"no elo4")
-# db.session.add(photo)
-#
-# db.session.commit()
-
 @app.route('/')
 def index():
     return "<h1> No siema </h1>"
