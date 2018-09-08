@@ -3,7 +3,6 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_json import FlaskJSON, JsonError, json_response, as_json
 import time
 
-
 app = Flask(__name__)
 FlaskJSON(app)
 
@@ -62,15 +61,14 @@ def processjson():
 @app.route('/photos')
 def photos():
     photos = Photo.query.all()
-    return jsonify(json_list=[i.serialize for i in photos ] )
+    return jsonify(json_list=[i.serialize for i in photos ])
 
 @app.route('/vote/<id>')
 def vote(id):
-    photo = Photo.query.filter_by(id=id).first()
+    photo = Photo.query.filter_by(id=int(id)).first()
     photo.votes = photo.votes + 1
     db.session.commit()
-    return '<h1> Success! <h1>'
-
+    return json_response(success=True)
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

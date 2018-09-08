@@ -1,9 +1,9 @@
 from minio import Minio
 from minio.error import ResponseError
 from datetime import timedelta
-import time,socket,sys,json,urllib,os,urllib2
-from flask import Flask, flash, request, redirect, url_for,render_template,send_from_directory
-
+import time,socket,sys,json,urllib,os,urllib, urllib2
+from flask import Flask, flash, request, redirect, url_for,render_template,send_from_directory, jsonify
+import requests
 
 def add_photo_to_db(photo):
     try:
@@ -80,8 +80,16 @@ def index():
     url = "http://flask_db:5000/photos"
     response = urllib.urlopen(url)
     data = json.loads(response.read())
+    return render_template('index.html', photos= data['json_list'])
 
-    return render_template('index.html',photos= data['json_list'])
+
+@app.route('/vote/<id>')
+def vote(id):
+    r = requests.get('http://flask_db:5000/vote/{}'.format(int(id)), auth=('user', 'pass'))
+    if r.status_code == 200:
+        return jsonify(success=True)
+    return jsonify(success=False)
+
 
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0',port=5151)
