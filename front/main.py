@@ -80,7 +80,12 @@ def index():
     url = "http://flask_db:5000/photos"
     response = urllib.urlopen(url)
     data = json.loads(response.read())
-    return render_template('index.html', photos= data['json_list'])
+
+    def cmp(x):
+        return x['votes']
+
+    photos = sorted(data['json_list'], key=cmp, reverse=True)
+    return render_template('index.html', photos=photos)
 
 
 @app.route('/vote/<id>')
