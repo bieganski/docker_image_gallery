@@ -2,79 +2,89 @@
 <html lang="en">
 <head>
     <style>
-    .thumbnail {
-        height:250px;
-        width:300px;
-    }
+        .thumbnail {
+            height: 250px;
+            width: 300px;
+        }
 
-    .button {
-        text-align: center;
-    }
+        .button {
+            text-align: center;
+        }
 
     </style>
 
     <script>
 
-    function vote(nr) {
-       $.get( "vote/" + nr.toString(), function( data ) {
-            alert("Twój głos został zapisany!");
-       });
-    }
+        function vote(nr) {
+            $.get("vote/" + nr.toString(), function (data) {
+                alert("Twój głos został zapisany!");
+                window.location.reload(false);
+            });
+        }
     </script>
 
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 </head>
 <body>
 
 <nav class="navbar navbar-light" style="background-color: #e3f2fd;">
-    <form id="upload-form" action="{{url_for('index')}}" method=post enctype=multipart/form-data>
-      <!--<input class="btn btn-primary" type=file name=file> <input class="btn btn-primary" type=submit value=Upload>-->
+    <form id="upload-form" action="{{ url_for('index') }}" method=post enctype=multipart/form-data>
+        <!--<input class="btn btn-primary" type=file name=file> <input class="btn btn-primary" type=submit value=Upload>-->
 
-    <div class="form-group col-md-4 col-lg-4 col-sm-6 img_space ">
-        <input type="file" name="file" class="form-control-file" id="file" aria-describedby="fileHelp">
-        <small id="fileHelp" class="form-text text-muted">This is some placeholder block-level help text for the above input. It's a bit lighter and easily wraps to a new line.</small>
-    </div>
+        <div class="form-group col-md-4 col-lg-4 col-sm-6 img_space ">
+            <input type="file" name="file" class="form-control-file" id="file" aria-describedby="fileHelp">
+            <small id="fileHelp" class="form-text text-muted"></small>
+        </div>
 
 
-    <div class="form-group">
-        <input class="btn btn-primary" type=submit value=Upload>
-    </div>
+        <div class="form-group">
+            <input class="btn btn-primary" type=submit value=Upload>
+        </div>
 
     </form>
 
 </nav>
-    <div class="container">
-        <div class="row">
-
-            {% for photo in photos %}
-            <div class="col-md-4 col-lg-4 col-sm-6 img_space ">
-              <!-- Trigger the modal with a button -->
-              <img class="img-responsive thumbnail " src="{{photo.url}}" data-toggle="modal" data-target="#photo{{photo.id}}">
-              <!-- Modal -->
-                    <div class="button">
-                        <button onclick="vote({{ photo.id }})" class="btn btn-warning" > Votes:{{ photo.votes }}</button>
-                    </div>
-            </div>
-            {% endfor %}
-        </div>
-
-
+<div class="container">
+    <div class="row">
 
         {% for photo in photos %}
-        <div class="modal fade" id="photo{{photo.id}}" role="dialog">
+            <div class="col-md-4 col-lg-4 col-sm-6 img_space ">
+                <!-- Trigger the modal with a button -->
+                <img class="img-responsive thumbnail"
+                     src="{{ photo.url }}" data-toggle="modal"
+                     style="width:100%; height:100%"
+                     data-target="#photo{{ photo.id }}">
+                <!-- Modal -->
+                <div>
+                    <div class="text" style="float:left;margin:20px">
+                        Głosy: {{ photo.votes }}
+                    </div>
+                    <div class="button" style="float:left;margin:20px">
+                        <button onclick="vote({{ photo.id }})" class="btn btn-warning"> Głosuj!</button>
+                    </div>
+                </div>
+
+            </div>
+        {% endfor %}
+    </div>
+
+
+
+    {% for photo in photos %}
+        <div class="modal fade" id="photo{{ photo.id }}" role="dialog">
             <div class="modal-dialog">
-            <!-- Modal content-->
+                <!-- Modal content-->
                 <a href="#" class="close" data-dismiss="modal"> </a>
-                <img class="img-responsive" src="{{photo.url}}">
+                <img class="img-responsive" src="{{ photo.url }}">
             </div>
         </div>
-        {% endfor %}
+    {% endfor %}
 
-    </div>
+</div>
 
 </body>
 </html>
