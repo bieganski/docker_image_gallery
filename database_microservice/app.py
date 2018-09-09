@@ -70,5 +70,10 @@ def vote(id):
     db.session.commit()
     return json_response(success=True)
 
+@app.route('/empty')
+def empty():
+    photos = Photo.query.all()
+    return json_response(empty=False if len(photos) else True)
+
 if __name__ == "__main__":
     app.run(debug=True, host='0.0.0.0')

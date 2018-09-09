@@ -19,7 +19,7 @@ def add_photo_to_db(photo):
     except:
         print("Could not add " + str(photo) + " to db..." )
 
-# Wait for minio to accepting connections
+
 address="notyet"
 while address == "notyet":
     try:
@@ -29,17 +29,27 @@ while address == "notyet":
         print("Waiting for minio")
         time.sleep(1)
 
-# We need to calculated by ip because there is signature
-# which is counted using hostname
+
 minioClient = Minio('{}:9000'.format(address),
                   access_key='ADMIN',
                   secret_key='EXAMPLEPASSWORD', secure=False)
 
-time.sleep(3)
 
-bucket_photos = minioClient.list_objects('animals')
-print( bucket_photos)
-[add_photo_to_db(photo.object_name.encode('utf-8')) for photo in bucket_photos ]
+
+def check_db_empty():
+    r = requests.get('http://flask_db:5000/empty', auth=('user', 'pass'))
+    return r.json()['empty']
+
+
+def populate_db():
+    try:
+        if check_db_empty():
+            bucket_photos = minioClient.list_objects('animals')
+            print(bucket_photos)
+            [add_photo_to_db(photo.object_name.encode('utf-8')) for photo in bucket_photos]
+    except:
+        print('Could not populate database!')
+
 
 app = Flask(__name__)
 
@@ -48,6 +58,9 @@ APP_ROOT = os.path.dirname(os.path.abspath(__file__))
 image_counter = 0
 @app.route('/',methods=['GET', 'POST'])
 def index():
+    if request.method == 'GET':
+        populate_db()
+
     if request.method == 'POST':
 
         target = os.path.join(APP_ROOT, 'images/')
