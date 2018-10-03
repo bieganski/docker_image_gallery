@@ -2,5 +2,5 @@
 Image gallery using docker 
 
 authors:
-Michał Krutul
+Michał Krutul,
 Mateusz Biegański
